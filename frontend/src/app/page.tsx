@@ -253,7 +253,7 @@ export default function Home() {
                   placeholder={`Enter ${conversionType.split("-")[0]} here...`}
                   value={input}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  className="min-h-[200px] resize-none font-mono text-sm"
+                  className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm"
                 />
               </div>
 
@@ -278,7 +278,7 @@ export default function Home() {
                   placeholder="Converted result will appear here..."
                   value={output}
                   readOnly
-                  className="min-h-[200px] resize-none font-mono text-sm bg-muted/30"
+                  className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm bg-muted/30"
                 />
               </div>
             </div>
