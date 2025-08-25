@@ -136,15 +136,30 @@ export default function Home() {
 
       <main className="container mx-auto px-6 py-8 max-w-6xl">
         {/* Hero Section */}
-        <section className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Universal Text Converter
-          </h2>
+        <header className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Free Text, Binary & Hex Converter
+          </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Convert between text, binary, and hexadecimal formats instantly.
-            Simple, fast, and reliable conversion with real-time results.
+            Simple, fast, and reliable conversion tool with real-time results.
+            No registration required.
           </p>
-        </section>
+          <div className="mt-4 text-sm text-muted-foreground">
+            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
+              ✨ Real-time conversion
+            </span>
+            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
+              🚀 WebAssembly powered
+            </span>
+            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
+              🔒 Privacy-focused
+            </span>
+            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
+              📱 Mobile friendly
+            </span>
+          </div>
+        </header>
 
         {/* Conversion Type Selection */}
         <div className="mb-8">
@@ -281,6 +296,9 @@ export default function Home() {
         {/* Footer */}
         <footer className="text-center mt-16 text-sm text-muted-foreground">
           <p>Built with Rust, WASM, Next.js, Tailwind CSS, and shadcn/ui</p>
+          <p className="mt-2">
+            © 2025 Tilman Kurmayer. Free online text conversion tool.
+          </p>
         </footer>
       </main>
     </div>

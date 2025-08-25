@@ -15,19 +15,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Web Converter - Text, Binary & Hex Converter",
+  title: {
+    default: "Web Converter - Free Text, Binary & Hex Converter Tool",
+    template: "%s | Web Converter",
+  },
   description:
-    "Convert between text, binary, and hexadecimal formats instantly. Simple, fast, and reliable conversion tool with real-time results.",
+    "Free online converter tool for text, binary, and hexadecimal formats. Convert text to binary, hex to text, binary to hex instantly with real-time results. No registration required.",
   keywords: [
     "text converter",
     "binary converter",
     "hex converter",
+    "hexadecimal converter",
     "text to binary",
     "binary to text",
     "text to hex",
     "hex to text",
+    "binary to hex",
+    "hex to binary",
+    "online converter",
+    "free converter tool",
+    "encoding decoder",
+    "ascii converter",
+    "wasm converter",
   ],
-  authors: [{ name: "Web Converter" }],
+  authors: [{ name: "Tilman Kurmayer" }],
+  creator: "Tilman Kurmayer",
+  publisher: "Tilman Kurmayer",
+  applicationName: "Tilman Kurmayer",
+  category: "Developer Tools",
+  classification: "Utility",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export const viewport: Viewport = {
