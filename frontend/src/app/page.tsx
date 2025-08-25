@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2025 Tilman Kurmayer. All rights reserved.
+ */
+
 "use client";
 
 import { useState } from "react";
