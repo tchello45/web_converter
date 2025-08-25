@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useTheme } from "next-themes";
 
 import {
   Copy,
@@ -10,9 +9,6 @@ import {
   Binary,
   Hash,
   Type,
-  Moon,
-  Sun,
-  Monitor,
 } from "lucide-react";
 
 import {
@@ -25,6 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import NavBar from "@/components/NavBar";
 
 type ConversionType =
   | "text-to-binary"
@@ -39,7 +36,6 @@ export default function Home() {
   const [output, setOutput] = useState("");
   const [conversionType, setConversionType] =
     useState<ConversionType>("text-to-binary");
-  const { theme, setTheme } = useTheme();
 
   const convertText = (text: string, type: ConversionType): string => {
     try {
@@ -149,42 +145,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Binary className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Web Converter</h1>
-              <p className="text-sm text-muted-foreground">
-                Text • Binary • Hex
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                setTheme(
-                  theme === "light"
-                    ? "dark"
-                    : theme === "dark"
-                    ? "system"
-                    : "light"
-                )
-              }
-            >
-              {theme === "light" && <Sun className="h-4 w-4" />}
-              {theme === "dark" && <Moon className="h-4 w-4" />}
-              {theme === "system" && <Monitor className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       <main className="container mx-auto px-6 py-8 max-w-6xl">
         {/* Hero Section */}
