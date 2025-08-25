@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 import { Binary, Moon, Sun, Monitor } from "lucide-react";
@@ -8,6 +9,11 @@ import { Button } from "@/components/ui/button";
 
 export default function NavBar() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
@@ -36,9 +42,10 @@ export default function NavBar() {
               )
             }
           >
-            {theme === "light" && <Sun className="h-4 w-4" />}
-            {theme === "dark" && <Moon className="h-4 w-4" />}
-            {theme === "system" && <Monitor className="h-4 w-4" />}
+            {mounted && theme === "light" && <Sun className="h-4 w-4" />}
+            {mounted && theme === "dark" && <Moon className="h-4 w-4" />}
+            {mounted && theme === "system" && <Monitor className="h-4 w-4" />}
+            {!mounted && <Monitor className="h-4 w-4" />}
           </Button>
         </div>
       </div>
