@@ -1,3 +1,6 @@
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
 pub fn convert_text_to_binary(text: &str) -> String {
     text.chars()
         .map(|c| format!("{:08b}", c as u8))
@@ -5,6 +8,7 @@ pub fn convert_text_to_binary(text: &str) -> String {
         .join(" ")
 }
 
+#[wasm_bindgen]
 pub fn convert_binary_to_text(binary: &str) -> String {
     binary
         .split(" ")
@@ -13,6 +17,7 @@ pub fn convert_binary_to_text(binary: &str) -> String {
         .join("")
 }
 
+#[wasm_bindgen]
 pub fn convert_text_to_hex(text: &str) -> String {
     text.chars()
         .map(|c| format!("{:02X}", c as u8))
@@ -20,6 +25,7 @@ pub fn convert_text_to_hex(text: &str) -> String {
         .join(" ")
 }
 
+#[wasm_bindgen]
 pub fn convert_hex_to_text(hex: &str) -> String {
     hex.split(" ")
         .map(|h| String::from_utf8(vec![u8::from_str_radix(h, 16).unwrap() as u8]).unwrap())
@@ -27,6 +33,7 @@ pub fn convert_hex_to_text(hex: &str) -> String {
         .join("")
 }
 
+#[wasm_bindgen]
 pub fn convert_binary_to_hex(binary: &str) -> String {
     binary
         .split(" ")
@@ -35,6 +42,7 @@ pub fn convert_binary_to_hex(binary: &str) -> String {
         .join(" ")
 }
 
+#[wasm_bindgen]
 pub fn convert_hex_to_binary(hex: &str) -> String {
     hex.split(" ")
         .map(|h| format!("{:08b}", u8::from_str_radix(h, 16).unwrap() as u8))
