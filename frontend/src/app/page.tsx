@@ -280,7 +280,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="text-center mt-16 text-sm text-muted-foreground">
-          <p>Built with Next.js, Tailwind CSS, and shadcn/ui</p>
+          <p>Built with Rust, WASM, Next.js, Tailwind CSS, and shadcn/ui</p>
         </footer>
       </main>
     </div>
