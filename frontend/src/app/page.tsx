@@ -12,6 +12,15 @@ import {
 } from "lucide-react";
 
 import {
+  convert_text_to_binary,
+  convert_binary_to_text,
+  convert_text_to_hex,
+  convert_hex_to_text,
+  convert_binary_to_hex,
+  convert_hex_to_binary,
+} from "converter-module";
+
+import {
   Card,
   CardContent,
   CardDescription,
@@ -41,39 +50,17 @@ export default function Home() {
     try {
       switch (type) {
         case "text-to-binary":
-          return text
-            .split("")
-            .map((char) => char.charCodeAt(0).toString(2).padStart(8, "0"))
-            .join(" ");
+          return convert_text_to_binary(text);
         case "binary-to-text":
-          return text
-            .split(" ")
-            .map((binary) => String.fromCharCode(parseInt(binary, 2)))
-            .join("");
+          return convert_binary_to_text(text);
         case "text-to-hex":
-          return text
-            .split("")
-            .map((char) =>
-              char.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0")
-            )
-            .join(" ");
+          return convert_text_to_hex(text);
         case "hex-to-text":
-          return text
-            .split(" ")
-            .map((hex) => String.fromCharCode(parseInt(hex, 16)))
-            .join("");
+          return convert_hex_to_text(text);
         case "binary-to-hex":
-          return text
-            .split(" ")
-            .map((binary) =>
-              parseInt(binary, 2).toString(16).toUpperCase().padStart(2, "0")
-            )
-            .join(" ");
+          return convert_binary_to_hex(text);
         case "hex-to-binary":
-          return text
-            .split(" ")
-            .map((hex) => parseInt(hex, 16).toString(2).padStart(8, "0"))
-            .join(" ");
+          return convert_hex_to_binary(text);
         default:
           return "";
       }

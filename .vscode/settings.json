@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "general",
-        "frontend"
+        "frontend",
+        "module"
     ]
 }
