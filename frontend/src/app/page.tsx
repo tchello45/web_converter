@@ -22,6 +22,10 @@ import {
   convert_hex_to_text,
   convert_binary_to_hex,
   convert_hex_to_binary,
+  convert_int_to_hex,
+  convert_hex_to_int,
+  convert_int_to_binary,
+  convert_binary_to_int,
 } from "converter-module";
 
 import {
@@ -80,10 +84,13 @@ export default function Home() {
         case "hex-to-binary":
           return convert_hex_to_binary(text);
         case "int-to-hex":
+          return convert_int_to_hex(BigInt(text));
         case "hex-to-int":
+          return convert_hex_to_int(text).toString();
         case "int-to-binary":
+          return convert_int_to_binary(BigInt(text));
         case "binary-to-int":
-          return "🚧 Integer conversions coming soon! The Rust backend will be implemented shortly.";
+          return convert_binary_to_int(text).toString();
         default:
           return "";
       }
@@ -373,9 +380,8 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
               {/* Integer to Others */}
               <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   From Integer
-                  <span className="text-orange-500">🚧</span>
                 </h4>
                 <div className="space-y-1">
                   <Button
@@ -384,7 +390,7 @@ export default function Home() {
                     }
                     size="sm"
                     onClick={() => handleConversionTypeChange("int-to-hex")}
-                    className="w-full justify-start text-xs opacity-75 hover:opacity-100"
+                    className="w-full justify-start text-xs"
                   >
                     <Type className="h-3 w-3 mr-2" />
                     Int → Hex
@@ -395,7 +401,7 @@ export default function Home() {
                     }
                     size="sm"
                     onClick={() => handleConversionTypeChange("int-to-binary")}
-                    className="w-full justify-start text-xs opacity-75 hover:opacity-100"
+                    className="w-full justify-start text-xs"
                   >
                     <Type className="h-3 w-3 mr-2" />
                     Int → Binary
@@ -405,9 +411,8 @@ export default function Home() {
 
               {/* To Integer */}
               <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   To Integer
-                  <span className="text-orange-500">🚧</span>
                 </h4>
                 <div className="space-y-1">
                   <Button
@@ -416,7 +421,7 @@ export default function Home() {
                     }
                     size="sm"
                     onClick={() => handleConversionTypeChange("hex-to-int")}
-                    className="w-full justify-start text-xs opacity-75 hover:opacity-100"
+                    className="w-full justify-start text-xs"
                   >
                     <Hash className="h-3 w-3 mr-2" />
                     Hex → Int
@@ -427,7 +432,7 @@ export default function Home() {
                     }
                     size="sm"
                     onClick={() => handleConversionTypeChange("binary-to-int")}
-                    className="w-full justify-start text-xs opacity-75 hover:opacity-100"
+                    className="w-full justify-start text-xs"
                   >
                     <Binary className="h-3 w-3 mr-2" />
                     Binary → Int
@@ -447,12 +452,8 @@ export default function Home() {
                   {getConversionTypeLabel(conversionType)}
                 </CardTitle>
                 <CardDescription>
-                  {conversionMode === "integer" &&
-                  conversionType.includes("int")
-                    ? "🚧 Integer conversions will be available once the Rust backend is implemented"
-                    : `Enter your ${
-                        conversionType.split("-")[0]
-                      } to convert to ${conversionType.split("-")[2]}`}
+                  Enter your {conversionType.split("-")[0]} to convert to{" "}
+                  {conversionType.split("-")[2]}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
