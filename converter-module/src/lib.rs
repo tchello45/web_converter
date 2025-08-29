@@ -52,6 +52,30 @@ pub fn convert_hex_to_binary(hex: &str) -> String {
         .join(" ")
 }
 
+#[wasm_bindgen]
+pub fn convert_int_to_hex(int: i64) -> String {
+    format!("{:X}", int)
+}
+
+#[wasm_bindgen]
+pub fn convert_hex_to_int(hex: &str) -> Result<i64, JsError> {
+    u64::from_str_radix(hex, 16)
+        .map(|num| num as i64)
+        .map_err(|e| JsError::new(&e.to_string()))
+}
+
+#[wasm_bindgen]
+pub fn convert_int_to_binary(int: i64) -> String {
+    format!("{:b}", int)
+}
+
+#[wasm_bindgen]
+pub fn convert_binary_to_int(binary: &str) -> Result<i64, JsError> {
+    u64::from_str_radix(binary, 2)
+        .map(|num| num as i64)
+        .map_err(|e| JsError::new(&e.to_string()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
