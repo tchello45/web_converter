@@ -180,21 +180,6 @@ export default function Home() {
     return labels[type];
   };
 
-  const getAvailableConversions = (mode: ConversionMode): ConversionType[] => {
-    if (mode === "text") {
-      return [
-        "text-to-binary",
-        "binary-to-text",
-        "text-to-hex",
-        "hex-to-text",
-        "binary-to-hex",
-        "hex-to-binary",
-      ];
-    } else {
-      return ["int-to-hex", "hex-to-int", "int-to-binary", "binary-to-int"];
-    }
-  };
-
   const getInputPlaceholder = (type: ConversionType): string => {
     const placeholders: Record<ConversionType, string> = {
       "text-to-binary": "Enter text here...\nExample: Hello World",
