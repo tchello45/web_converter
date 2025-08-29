@@ -22,6 +22,10 @@ import {
   convert_hex_to_text,
   convert_binary_to_hex,
   convert_hex_to_binary,
+  convert_int_to_hex,
+  convert_hex_to_int,
+  convert_int_to_binary,
+  convert_binary_to_int,
 } from "converter-module";
 
 import {
@@ -34,7 +38,16 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import NavBar from "@/components/NavBar";
+
+type ConversionMode = "text" | "integer";
 
 type ConversionType =
   | "text-to-binary"
@@ -42,11 +55,16 @@ type ConversionType =
   | "text-to-hex"
   | "hex-to-text"
   | "binary-to-hex"
-  | "hex-to-binary";
+  | "hex-to-binary"
+  | "int-to-hex"
+  | "hex-to-int"
+  | "int-to-binary"
+  | "binary-to-int";
 
 export default function Home() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [conversionMode, setConversionMode] = useState<ConversionMode>("text");
   const [conversionType, setConversionType] =
     useState<ConversionType>("text-to-binary");
 
@@ -65,6 +83,14 @@ export default function Home() {
           return convert_binary_to_hex(text);
         case "hex-to-binary":
           return convert_hex_to_binary(text);
+        case "int-to-hex":
+          return convert_int_to_hex(BigInt(text));
+        case "hex-to-int":
+          return convert_hex_to_int(text).toString();
+        case "int-to-binary":
+          return convert_int_to_binary(BigInt(text));
+        case "binary-to-int":
+          return convert_binary_to_int(text).toString();
         default:
           return "";
       }
@@ -87,6 +113,18 @@ export default function Home() {
     setConversionType(type);
     if (input.trim()) {
       const result = convertText(input, type);
+      setOutput(result);
+    }
+  };
+
+  const handleConversionModeChange = (mode: ConversionMode) => {
+    setConversionMode(mode);
+    // Reset to first conversion type of the selected mode
+    const defaultType: ConversionType =
+      mode === "text" ? "text-to-binary" : "int-to-hex";
+    setConversionType(defaultType);
+    if (input.trim()) {
+      const result = convertText(input, defaultType);
       setOutput(result);
     }
   };
@@ -118,6 +156,10 @@ export default function Home() {
       "hex-to-text": "text-to-hex",
       "binary-to-hex": "hex-to-binary",
       "hex-to-binary": "binary-to-hex",
+      "int-to-hex": "hex-to-int",
+      "hex-to-int": "int-to-hex",
+      "int-to-binary": "binary-to-int",
+      "binary-to-int": "int-to-binary",
     };
     setConversionType(reverseMap[conversionType]);
   };
@@ -130,8 +172,30 @@ export default function Home() {
       "hex-to-text": "Hex → Text",
       "binary-to-hex": "Binary → Hex",
       "hex-to-binary": "Hex → Binary",
+      "int-to-hex": "Int → Hex",
+      "hex-to-int": "Hex → Int",
+      "int-to-binary": "Int → Binary",
+      "binary-to-int": "Binary → Int",
     };
     return labels[type];
+  };
+
+  const getInputPlaceholder = (type: ConversionType): string => {
+    const placeholders: Record<ConversionType, string> = {
+      "text-to-binary": "Enter text here...\nExample: Hello World",
+      "binary-to-text":
+        "Enter binary here...\nExample: 01001000 01100101 01101100 01101100 01101111",
+      "text-to-hex": "Enter text here...\nExample: Hello World",
+      "hex-to-text": "Enter hex here...\nExample: 48 65 6C 6C 6F",
+      "binary-to-hex":
+        "Enter binary here...\nExample: 01001000 01100101 01101100",
+      "hex-to-binary": "Enter hex here...\nExample: 48 65 6C",
+      "int-to-hex": "Enter integer here...\nExample: 255, -1, 1024",
+      "hex-to-int": "Enter hex here...\nExample: FF, 0xFF, DEADBEEF",
+      "int-to-binary": "Enter integer here...\nExample: 42, -10, 1000",
+      "binary-to-int": "Enter binary here...\nExample: 1010, 11111111, 101010",
+    };
+    return placeholders[type];
   };
 
   return (
@@ -142,12 +206,12 @@ export default function Home() {
         {/* Hero Section */}
         <header className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Free Text, Binary & Hex Converter
+            Free Text & Integer Converter
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Convert between text, binary, and hexadecimal formats instantly.
-            Simple, fast, and reliable conversion tool with real-time results.
-            No registration required.
+            Convert between text, integers, binary, and hexadecimal formats
+            instantly. Simple, fast, and reliable conversion tool with real-time
+            results. No registration required.
           </p>
           <div className="mt-4 text-sm text-muted-foreground">
             <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
@@ -165,40 +229,203 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Conversion Type Selection */}
+        {/* Conversion Selection */}
         <div className="mb-8">
           <Label className="text-sm font-medium mb-4 block">
-            Conversion Type
+            Choose Conversion
           </Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {(
-              [
-                "text-to-binary",
-                "binary-to-text",
-                "text-to-hex",
-                "hex-to-text",
-                "binary-to-hex",
-                "hex-to-binary",
-              ] as ConversionType[]
-            ).map((type) => (
-              <Button
-                key={type}
-                variant={conversionType === type ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConversionTypeChange(type)}
-                className="text-xs"
-              >
-                {type.includes("text") && <Type className="h-3 w-3 mr-1" />}
-                {type.includes("binary") && !type.includes("text") && (
-                  <Binary className="h-3 w-3 mr-1" />
-                )}
-                {type.includes("hex") && !type.includes("text") && (
-                  <Hash className="h-3 w-3 mr-1" />
-                )}
-                {getConversionTypeLabel(type)}
-              </Button>
-            ))}
+
+          {/* Mode Selection */}
+          <div className="mb-6">
+            <Select
+              value={conversionMode}
+              onValueChange={handleConversionModeChange}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select conversion mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="text">
+                  <div className="flex items-center gap-2">
+                    <Type className="h-4 w-4" />
+                    Text Conversion
+                  </div>
+                </SelectItem>
+                <SelectItem value="integer">
+                  <div className="flex items-center gap-2">
+                    <Hash className="h-4 w-4" />
+                    Integer Conversion
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* Conversion Types Grid */}
+          {conversionMode === "text" ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {/* Text to Others */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  From Text
+                </h4>
+                <div className="space-y-1">
+                  <Button
+                    variant={
+                      conversionType === "text-to-binary"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("text-to-binary")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Type className="h-3 w-3 mr-2" />
+                    Text → Binary
+                  </Button>
+                  <Button
+                    variant={
+                      conversionType === "text-to-hex" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("text-to-hex")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Type className="h-3 w-3 mr-2" />
+                    Text → Hex
+                  </Button>
+                </div>
+              </div>
+
+              {/* To Text */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  To Text
+                </h4>
+                <div className="space-y-1">
+                  <Button
+                    variant={
+                      conversionType === "binary-to-text"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("binary-to-text")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Binary className="h-3 w-3 mr-2" />
+                    Binary → Text
+                  </Button>
+                  <Button
+                    variant={
+                      conversionType === "hex-to-text" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("hex-to-text")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Hash className="h-3 w-3 mr-2" />
+                    Hex → Text
+                  </Button>
+                </div>
+              </div>
+
+              {/* Binary ↔ Hex */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Binary ↔ Hex
+                </h4>
+                <div className="space-y-1">
+                  <Button
+                    variant={
+                      conversionType === "binary-to-hex" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("binary-to-hex")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Binary className="h-3 w-3 mr-2" />
+                    Binary → Hex
+                  </Button>
+                  <Button
+                    variant={
+                      conversionType === "hex-to-binary" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("hex-to-binary")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Hash className="h-3 w-3 mr-2" />
+                    Hex → Binary
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+              {/* Integer to Others */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  From Integer
+                </h4>
+                <div className="space-y-1">
+                  <Button
+                    variant={
+                      conversionType === "int-to-hex" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("int-to-hex")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Type className="h-3 w-3 mr-2" />
+                    Int → Hex
+                  </Button>
+                  <Button
+                    variant={
+                      conversionType === "int-to-binary" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("int-to-binary")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Type className="h-3 w-3 mr-2" />
+                    Int → Binary
+                  </Button>
+                </div>
+              </div>
+
+              {/* To Integer */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  To Integer
+                </h4>
+                <div className="space-y-1">
+                  <Button
+                    variant={
+                      conversionType === "hex-to-int" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("hex-to-int")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Hash className="h-3 w-3 mr-2" />
+                    Hex → Int
+                  </Button>
+                  <Button
+                    variant={
+                      conversionType === "binary-to-int" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleConversionTypeChange("binary-to-int")}
+                    className="w-full justify-start text-xs"
+                  >
+                    <Binary className="h-3 w-3 mr-2" />
+                    Binary → Int
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Converter Card */}
@@ -254,7 +481,7 @@ export default function Home() {
                 </div>
                 <Textarea
                   id="input"
-                  placeholder={`Enter ${conversionType.split("-")[0]} here...`}
+                  placeholder={getInputPlaceholder(conversionType)}
                   value={input}
                   onChange={(e) => handleInputChange(e.target.value)}
                   className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm"

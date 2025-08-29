@@ -52,6 +52,30 @@ pub fn convert_hex_to_binary(hex: &str) -> String {
         .join(" ")
 }
 
+#[wasm_bindgen]
+pub fn convert_int_to_hex(int: i64) -> String {
+    format!("{:X}", int)
+}
+
+#[wasm_bindgen]
+pub fn convert_hex_to_int(hex: &str) -> Result<i64, JsError> {
+    u64::from_str_radix(hex, 16)
+        .map(|num| num as i64)
+        .map_err(|e| JsError::new(&e.to_string()))
+}
+
+#[wasm_bindgen]
+pub fn convert_int_to_binary(int: i64) -> String {
+    format!("{:b}", int)
+}
+
+#[wasm_bindgen]
+pub fn convert_binary_to_int(binary: &str) -> Result<i64, JsError> {
+    u64::from_str_radix(binary, 2)
+        .map(|num| num as i64)
+        .map_err(|e| JsError::new(&e.to_string()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,5 +130,25 @@ mod tests {
             convert_hex_to_binary("48 65 6C 6C 6F 20 77 6F 72 6C 64"),
             "01001000 01100101 01101100 01101100 01101111 00100000 01110111 01101111 01110010 01101100 01100100"
         );
+    }
+
+    #[test]
+    fn test_convert_int_to_hex() {
+        assert_eq!(convert_int_to_hex(255), "FF");
+    }
+
+    #[test]
+    fn test_convert_hex_to_int() {
+        assert_eq!(convert_hex_to_int("FF").unwrap(), 255);
+    }
+
+    #[test]
+    fn test_convert_int_to_binary() {
+        assert_eq!(convert_int_to_binary(5), "101");
+    }
+
+    #[test]
+    fn test_convert_binary_to_int() {
+        assert_eq!(convert_binary_to_int("101").unwrap(), 5);
     }
 }
