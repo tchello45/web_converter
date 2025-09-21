@@ -46,6 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import NavBar from "@/components/NavBar";
+import { motion, AnimatePresence } from "motion/react";
 
 type ConversionMode = "text" | "integer";
 
@@ -67,6 +68,7 @@ export default function Home() {
   const [conversionMode, setConversionMode] = useState<ConversionMode>("text");
   const [conversionType, setConversionType] =
     useState<ConversionType>("text-to-binary");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const convertText = (text: string, type: ConversionType): string => {
     try {
@@ -99,33 +101,43 @@ export default function Home() {
     }
   };
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = async (value: string) => {
     setInput(value);
     if (value.trim()) {
+      setIsProcessing(true);
+      // Add a small delay to show the processing animation
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const result = convertText(value, conversionType);
       setOutput(result);
+      setIsProcessing(false);
     } else {
       setOutput("");
     }
   };
 
-  const handleConversionTypeChange = (type: ConversionType) => {
+  const handleConversionTypeChange = async (type: ConversionType) => {
     setConversionType(type);
     if (input.trim()) {
+      setIsProcessing(true);
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const result = convertText(input, type);
       setOutput(result);
+      setIsProcessing(false);
     }
   };
 
-  const handleConversionModeChange = (mode: ConversionMode) => {
+  const handleConversionModeChange = async (mode: ConversionMode) => {
     setConversionMode(mode);
     // Reset to first conversion type of the selected mode
     const defaultType: ConversionType =
       mode === "text" ? "text-to-binary" : "int-to-hex";
     setConversionType(defaultType);
     if (input.trim()) {
+      setIsProcessing(true);
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const result = convertText(input, defaultType);
       setOutput(result);
+      setIsProcessing(false);
     }
   };
 
@@ -199,12 +211,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+    <motion.div
+      className="min-h-screen bg-gradient-to-br from-background to-muted/20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <NavBar />
 
-      <main className="container mx-auto px-6 py-8 max-w-6xl">
+      <motion.main
+        className="container mx-auto px-6 py-8 max-w-6xl"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
         {/* Hero Section */}
-        <header className="text-center mb-12">
+        <motion.header
+          className="text-center mb-12"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+        >
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Free Text & Integer Converter
           </h1>
@@ -214,23 +241,37 @@ export default function Home() {
             results. No registration required.
           </p>
           <div className="mt-4 text-sm text-muted-foreground">
-            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
-              ✨ Real-time conversion
-            </span>
-            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
-              🚀 WebAssembly powered
-            </span>
-            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
-              🔒 Privacy-focused
-            </span>
-            <span className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2">
-              📱 Mobile friendly
-            </span>
+            {[
+              { icon: "✨", text: "Real-time conversion", delay: 0.5 },
+              { icon: "🚀", text: "WebAssembly powered", delay: 0.6 },
+              { icon: "🔒", text: "Privacy-focused", delay: 0.7 },
+              { icon: "📱", text: "Mobile friendly", delay: 0.8 },
+            ].map((badge, index) => (
+              <motion.span
+                key={badge.text}
+                className="inline-block bg-muted/50 px-3 py-1 rounded-full mr-2 mb-2 cursor-default"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: badge.delay }}
+                whileHover={{
+                  scale: 1.05,
+                  backgroundColor: "hsl(var(--muted) / 0.8)",
+                  transition: { duration: 0.2 },
+                }}
+              >
+                {badge.icon} {badge.text}
+              </motion.span>
+            ))}
           </div>
-        </header>
+        </motion.header>
 
         {/* Conversion Selection */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           <Label className="text-sm font-medium mb-4 block">
             Choose Conversion
           </Label>
@@ -262,276 +303,545 @@ export default function Home() {
           </div>
 
           {/* Conversion Types Grid */}
-          {conversionMode === "text" ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {/* Text to Others */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  From Text
-                </h4>
-                <div className="space-y-1">
-                  <Button
-                    variant={
-                      conversionType === "text-to-binary"
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("text-to-binary")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Type className="h-3 w-3 mr-2" />
-                    Text → Binary
-                  </Button>
-                  <Button
-                    variant={
-                      conversionType === "text-to-hex" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("text-to-hex")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Type className="h-3 w-3 mr-2" />
-                    Text → Hex
-                  </Button>
+          <AnimatePresence mode="wait">
+            {conversionMode === "text" ? (
+              <motion.div
+                key="text-mode"
+                className="grid grid-cols-2 md:grid-cols-3 gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Text to Others */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    From Text
+                  </h4>
+                  <div className="space-y-1">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "text-to-binary"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("text-to-binary")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Type className="h-3 w-3 mr-2" />
+                        Text → Binary
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "text-to-hex"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("text-to-hex")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Type className="h-3 w-3 mr-2" />
+                        Text → Hex
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
 
-              {/* To Text */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  To Text
-                </h4>
-                <div className="space-y-1">
-                  <Button
-                    variant={
-                      conversionType === "binary-to-text"
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("binary-to-text")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Binary className="h-3 w-3 mr-2" />
-                    Binary → Text
-                  </Button>
-                  <Button
-                    variant={
-                      conversionType === "hex-to-text" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("hex-to-text")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Hash className="h-3 w-3 mr-2" />
-                    Hex → Text
-                  </Button>
+                {/* To Text */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    To Text
+                  </h4>
+                  <div className="space-y-1">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "binary-to-text"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("binary-to-text")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Binary className="h-3 w-3 mr-2" />
+                        Binary → Text
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "hex-to-text"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("hex-to-text")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Hash className="h-3 w-3 mr-2" />
+                        Hex → Text
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Binary ↔ Hex */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Binary ↔ Hex
-                </h4>
-                <div className="space-y-1">
-                  <Button
-                    variant={
-                      conversionType === "binary-to-hex" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("binary-to-hex")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Binary className="h-3 w-3 mr-2" />
-                    Binary → Hex
-                  </Button>
-                  <Button
-                    variant={
-                      conversionType === "hex-to-binary" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("hex-to-binary")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Hash className="h-3 w-3 mr-2" />
-                    Hex → Binary
-                  </Button>
+                {/* Binary ↔ Hex */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Binary ↔ Hex
+                  </h4>
+                  <div className="space-y-1">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "binary-to-hex"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("binary-to-hex")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Binary className="h-3 w-3 mr-2" />
+                        Binary → Hex
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "hex-to-binary"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("hex-to-binary")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Hash className="h-3 w-3 mr-2" />
+                        Hex → Binary
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
-              {/* Integer to Others */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  From Integer
-                </h4>
-                <div className="space-y-1">
-                  <Button
-                    variant={
-                      conversionType === "int-to-hex" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("int-to-hex")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Type className="h-3 w-3 mr-2" />
-                    Int → Hex
-                  </Button>
-                  <Button
-                    variant={
-                      conversionType === "int-to-binary" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("int-to-binary")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Type className="h-3 w-3 mr-2" />
-                    Int → Binary
-                  </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="integer-mode"
+                className="grid grid-cols-2 md:grid-cols-2 gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Integer to Others */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    From Integer
+                  </h4>
+                  <div className="space-y-1">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "int-to-hex"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handleConversionTypeChange("int-to-hex")}
+                        className="w-full justify-start text-xs"
+                      >
+                        <Type className="h-3 w-3 mr-2" />
+                        Int → Hex
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "int-to-binary"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("int-to-binary")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Type className="h-3 w-3 mr-2" />
+                        Int → Binary
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
 
-              {/* To Integer */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  To Integer
-                </h4>
-                <div className="space-y-1">
-                  <Button
-                    variant={
-                      conversionType === "hex-to-int" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("hex-to-int")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Hash className="h-3 w-3 mr-2" />
-                    Hex → Int
-                  </Button>
-                  <Button
-                    variant={
-                      conversionType === "binary-to-int" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleConversionTypeChange("binary-to-int")}
-                    className="w-full justify-start text-xs"
-                  >
-                    <Binary className="h-3 w-3 mr-2" />
-                    Binary → Int
-                  </Button>
+                {/* To Integer */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    To Integer
+                  </h4>
+                  <div className="space-y-1">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "hex-to-int"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handleConversionTypeChange("hex-to-int")}
+                        className="w-full justify-start text-xs"
+                      >
+                        <Hash className="h-3 w-3 mr-2" />
+                        Hex → Int
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant={
+                          conversionType === "binary-to-int"
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          handleConversionTypeChange("binary-to-int")
+                        }
+                        className="w-full justify-start text-xs"
+                      >
+                        <Binary className="h-3 w-3 mr-2" />
+                        Binary → Int
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Converter Card */}
-        <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl">
-                  {getConversionTypeLabel(conversionType)}
-                </CardTitle>
-                <CardDescription>
-                  Enter your {conversionType.split("-")[0]} to convert to{" "}
-                  {conversionType.split("-")[2]}
-                </CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={swapInputOutput}
-                  disabled={!output}
-                >
-                  <ArrowLeftRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearAll}
-                  disabled={!input && !output}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Input */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="input" className="text-sm font-medium">
-                    Input ({conversionType.split("-")[0]})
-                  </Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(input)}
-                    disabled={!input}
-                    className="h-6 px-2"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+        >
+          <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl">
+                    {getConversionTypeLabel(conversionType)}
+                  </CardTitle>
+                  <CardDescription>
+                    Enter your {conversionType.split("-")[0]} to convert to{" "}
+                    {conversionType.split("-")[2]}
+                  </CardDescription>
                 </div>
-                <Textarea
-                  id="input"
-                  placeholder={getInputPlaceholder(conversionType)}
-                  value={input}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm"
-                />
+                <div className="flex gap-2">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={swapInputOutput}
+                      disabled={!output}
+                    >
+                      <ArrowLeftRight className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearAll}
+                      disabled={!input && !output}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Input */}
+                <motion.div
+                  className="space-y-3"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="input" className="text-sm font-medium">
+                      Input ({conversionType.split("-")[0]})
+                    </Label>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(input)}
+                        disabled={!input}
+                        className="h-6 px-2"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                  <Textarea
+                    id="input"
+                    placeholder={getInputPlaceholder(conversionType)}
+                    value={input}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm"
+                  />
+                </motion.div>
+
+                {/* Output */}
+                <motion.div
+                  className="space-y-3"
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="output" className="text-sm font-medium">
+                      Output ({conversionType.split("-")[2]})
+                    </Label>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(output)}
+                        disabled={!output}
+                        className="h-6 px-2"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                  <div className="relative">
+                    <motion.div
+                      key={output}
+                      initial={{ opacity: 0.7 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Textarea
+                        id="output"
+                        placeholder="Converted result will appear here..."
+                        value={output}
+                        readOnly
+                        className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm bg-muted/30"
+                      />
+                    </motion.div>
+
+                    {/* Processing Indicator */}
+                    <AnimatePresence>
+                      {isProcessing && (
+                        <motion.div
+                          className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-md"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <motion.div
+                            className="flex items-center gap-2 text-sm text-muted-foreground"
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.8 }}
+                          >
+                            <motion.div
+                              className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full"
+                              animate={{ rotate: 360 }}
+                              transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                ease: "linear",
+                              }}
+                            />
+                            Processing...
+                          </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
               </div>
 
-              {/* Output */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="output" className="text-sm font-medium">
-                    Output ({conversionType.split("-")[2]})
-                  </Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(output)}
-                    disabled={!output}
-                    className="h-6 px-2"
+              {/* Stats */}
+              <AnimatePresence>
+                {(input || output) && (
+                  <motion.div
+                    className="flex justify-center gap-8 pt-4 border-t text-sm text-muted-foreground"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-                <Textarea
-                  id="output"
-                  placeholder="Converted result will appear here..."
-                  value={output}
-                  readOnly
-                  className="min-h-[200px] max-h-[300px] resize-none font-mono text-sm bg-muted/30"
-                />
-              </div>
-            </div>
-
-            {/* Stats */}
-            {(input || output) && (
-              <div className="flex justify-center gap-8 pt-4 border-t text-sm text-muted-foreground">
-                <div>Input: {input.length} chars</div>
-                <div>Output: {output.length} chars</div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.1,
+                        type: "spring",
+                        stiffness: 300,
+                      }}
+                    >
+                      Input: {input.length} chars
+                    </motion.div>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.2,
+                        type: "spring",
+                        stiffness: 300,
+                      }}
+                    >
+                      Output: {output.length} chars
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Footer */}
-        <footer className="text-center mt-16 text-sm text-muted-foreground">
+        <motion.footer
+          className="text-center mt-16 text-sm text-muted-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+        >
           <p>Built with Rust, WASM, Next.js, Tailwind CSS, and shadcn/ui</p>
           <p className="mt-2">
             © 2025 Tilman Kurmayer. Free online text conversion tool.
           </p>
-        </footer>
-      </main>
-    </div>
+        </motion.footer>
+      </motion.main>
+    </motion.div>
   );
 }
